@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:saf/src/storage_access_framework/api.dart';
 import 'package:saf/src/channels.dart';
 
@@ -113,6 +115,34 @@ class Saf {
     } catch (e) {
       return null;
     }
+  }
+
+  Future<Uint8List?> getDocumentThumbnail({
+    required Uri rootUri,
+    required String documentId,
+    required double width,
+    required double height,
+  }) async {
+    const kGetDocumentThumbnail = 'getDocumentThumbnail';
+
+    const kRootUri = 'rootUri';
+    const kDocumentId = 'documentId';
+    const kWidth = 'width';
+    const kHeight = 'height';
+
+    final args = <String, dynamic>{
+      kRootUri: '$rootUri',
+      kDocumentId: documentId,
+      kWidth: width,
+      kHeight: height,
+    };
+
+    final bitmap = await kDocumentsContractChannel
+        .invokeMapMethod<String, dynamic>(kGetDocumentThumbnail, args);
+
+    if (bitmap == null) return null;
+
+    return (DocumentBitmap.fromMap(bitmap)).bytes;
   }
 
   // Request to `cache` the Granted Directory into App's Package [files] folder
